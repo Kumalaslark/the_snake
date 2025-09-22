@@ -60,19 +60,18 @@ class GameObject:
 
     def draw(self):
         """Метод отрисовки. Должен быть переопределён в наследниках."""
-        raise NotImplementedError
+        raise NotImplementedError(
+            f"draw() не реализован в классе {self.__class__.__name__}")
 
 
 class Apple(GameObject):
     """Класс яблока."""
 
-    def __init__(self, position=None, body_color=APPLE_COLOR,
+    def __init__(self, position=DEFAULT_POSITION, body_color=APPLE_COLOR,
                  occupied_positions=None):
-        if position is None:
-            position = (0, 0)
         super().__init__(position, body_color)
-        if position == (0, 0):
-            self.randomize_position()
+        if position == DEFAULT_POSITION:
+            self.randomize_position(occupied_positions)
 
     def randomize_position(self, occupied_positions=None):
         """Устанавливает случайную позицию яблока."""
@@ -80,18 +79,14 @@ class Apple(GameObject):
             occupied_positions = []
 
         while True:
-            x = randint(0, GRID_WIDTH - 1) * GRID_SIZE
-            y = randint(0, GRID_HEIGHT - 1) * GRID_SIZE
-            new_position = (x, y)
-            if new_position not in occupied_positions:
-                self.position = new_position
+            self.position = (randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+                             randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
+            if self.position not in occupied_positions:
                 break
 
     def draw(self):
         """Отрисовывает яблоко."""
-        rect = pg.Rect(self.position, (GRID_SIZE, GRID_SIZE))
-        pg.draw.rect(screen, self.body_color, rect)
-        pg.draw.rect(screen, BORDER_COLOR, rect, 1)
+        self.draw_cell(self.position, self.body_color)
 
 
 class Snake(GameObject):
@@ -106,21 +101,11 @@ class Snake(GameObject):
         return self.positions[0]
 
     def update_direction(self, new_direction=None):
-        """Обновляет направление движения змейки.
-
-        Если передан new_direction — обновляем направление,
-        если нет — используем self.next_direction.
-        """
+        """Обновляет направление движения змейки."""
         if new_direction:
             opposite = (-self.direction[0], -self.direction[1])
             if new_direction != opposite:
                 self.direction = new_direction
-            self.next_direction = None
-        elif self.next_direction:
-            opposite = (-self.direction[0], -self.direction[1])
-            if self.next_direction != opposite:
-                self.direction = self.next_direction
-            self.next_direction = None
 
     def move(self):
         """Передвигает змейку по экрану."""
@@ -147,7 +132,6 @@ class Snake(GameObject):
         self.position = START_SNAKE_POSITION
         self.positions = [self.position]
         self.direction = RIGHT
-        self.next_direction = None
 
 
 def handle_keys(snake):
@@ -183,11 +167,10 @@ def main():
     while True:
         clock.tick(SPEED)
         handle_keys(snake)
-        snake.update_direction()
         snake.move()
 
         head = snake.get_head_position()
-        if head in snake.positions[1:]:
+        if head in snake.positions[4:]:
             snake.reset()
 
         if head == apple.position:
