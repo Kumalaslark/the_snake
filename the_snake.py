@@ -70,19 +70,17 @@ class Apple(GameObject):
     def __init__(self, position=DEFAULT_POSITION, body_color=APPLE_COLOR,
                  occupied_positions=None):
         super().__init__(position, body_color)
-        if position == DEFAULT_POSITION:
-            self.randomize_position(occupied_positions)
+        self.randomize_position(occupied_positions)
 
     def randomize_position(self, occupied_positions=None):
-        """Устанавливает случайную позицию яблока."""
+        """Устанавливает случайную позицию яблока, если текущая занята."""
         if occupied_positions is None:
             occupied_positions = []
-
-        while True:
-            self.position = (randint(0, GRID_WIDTH - 1) * GRID_SIZE,
-                             randint(0, GRID_HEIGHT - 1) * GRID_SIZE)
-            if self.position not in occupied_positions:
-                break
+        while self.position in occupied_positions:
+            self.position = (
+                randint(0, GRID_WIDTH - 1) * GRID_SIZE,
+                randint(0, GRID_HEIGHT - 1) * GRID_SIZE,
+            )
 
     def draw(self):
         """Отрисовывает яблоко."""
@@ -129,7 +127,6 @@ class Snake(GameObject):
     def reset(self):
         """Сбрасывает змейку в начальное состояние."""
         self.length = 1
-        self.position = START_SNAKE_POSITION
         self.positions = [self.position]
         self.direction = RIGHT
 
