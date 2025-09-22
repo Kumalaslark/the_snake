@@ -61,7 +61,7 @@ class GameObject:
     def draw(self):
         """Метод отрисовки. Должен быть переопределён в наследниках."""
         raise NotImplementedError(
-            f"draw() не реализован в классе {self.__class__.__name__}")
+            f'draw() не реализован в классе {self.__class__.__name__}')
 
 
 class Apple(GameObject):
